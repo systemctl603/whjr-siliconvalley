@@ -1,0 +1,7 @@
+{
+  "name": "schoolschedule",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
