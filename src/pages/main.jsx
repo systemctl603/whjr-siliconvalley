@@ -7,10 +7,9 @@ import "./main.css";
 import ModalTemplate from "../components/modal";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import { addChild, getChilds } from "../App";
+import { addChild, getChilds, clearData } from "../App";
 
 function HomePage() {
-  addChild("Hello");
   getChilds();
   const { Storage, StatusBar } = Plugins;
   const [showActionSheet, setShowActionSheet] = useState(false);
@@ -22,6 +21,14 @@ function HomePage() {
   const Buttons = [
     {
       text: "Delete",
+      role: "destructive",
+      icon: Icons.trash,
+      handler: () => {
+        clearData();
+      },
+    },
+    {
+      text: "Remove All Children",
       role: "destructive",
       icon: Icons.trash,
       handler: () => {
@@ -97,9 +104,14 @@ function HomePage() {
         <ModalTemplate
           hook={showAddChildMenu}
           hookChange={(val) => setShowAddChildMenu(val)}
+          hook2={(name) => {
+            setChildInName(name);
+            console.log(name);
+          }}
           name="Child Name:"
-          title={childInName}
-          callback={() => {
+          title="Add Child"
+          callback={(x) => {
+            addChild(x);
             setShowAddChildMenu(false);
           }}
         />
@@ -112,7 +124,7 @@ function HomePage() {
           showDate="true"
           datename="Due Date"
           title="Add Class"
-          callback={() => {
+          callback={(x) => {
             setShowAddClass(false);
           }}
         />

@@ -1,5 +1,4 @@
 import React from "react";
-import { Redirect, Route, Switch } from "react-router-dom";
 import {
   IonApp,
   IonIcon,
@@ -34,39 +33,40 @@ import "@ionic/react/css/display.css";
 
 /* Theme variables */
 import "./theme/variables.css";
-var childNum;
-async function fetchChildNum() {
-  var { value } = await Storage.get({});
-}
 const { Storage } = Plugins;
+var childNum = 1;
+
+async function fetchChildNum() {
+  var { value } = await Storage.get({ key: "childnum" });
+  value == null ? (value = 0) : (value = parseInt(value));
+  return value;
+}
+
 export async function addChild(name) {
-  var { value } = await Storage.get({ key: "childIndx" });
+  var { value } = await Storage.get({ key: "children" });
+  value = JSON.parse(value);
+  const childnum = await fetchChildNum();
+  await Storage.set({ key: "childnum", value: `${++childnum}` });
+
   console.log(value);
-  if (typeof value != "string") {
-    console.log(typeof value);
-    await Storage.set({
-      key: "childIndx",
-      value: "2",
-    });
-    value = "1";
-    console.log("test");
-  } else {
-    value++;
-  }
+  if (value == null) value = [];
+  console.log(value, typeof value);
+
+  value.push(name);
   await Storage.set({
-    key: `child${value}`,
-    value: JSON.stringify({
-      name: name,
-      index: value,
-    }),
+    key: "children",
+    value: JSON.stringify(value),
   });
 }
 
 export async function getChilds() {
   const { value } = await Storage.get({ key: "child1" });
-  console.log(JSON.parse(value));
 }
 
+export async function clearData() {
+  await Storage.remove({ key: "children" });
+  console.log();
+}
 export const App = () => (
   <IonApp>
     <IonReactRouter>

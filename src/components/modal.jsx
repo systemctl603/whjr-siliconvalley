@@ -33,23 +33,18 @@ export default function ModalTemplate(props) {
           <Ionic.IonIcon icon={Icons.exitOutline}></Ionic.IonIcon>
         </Ionic.IonFabButton>
       </Ionic.IonToolbar>
-      <form slot="start" id="form">
-        <Ionic.IonItem lines="full">
+      <form id="form">
+        <Ionic.IonItem>
           <Ionic.IonLabel>{props.name}</Ionic.IonLabel>
-          <Ionic.IonInput
-            onChange={(e) => {
-              if (typeof props.hook2 == Function) {
-                props.hook2(e.target.value);
-              }
-            }}
-          ></Ionic.IonInput>
+          <Ionic.IonInput id="input"></Ionic.IonInput>
           <br />
         </Ionic.IonItem>
         {datetime}
         <Ionic.IonButton
           expand="full"
           onClick={() => {
-            props.callback();
+            var x = document.getElementById("input").value;
+            props.callback(x);
           }}
         >
           Submit
