@@ -60,9 +60,13 @@ export async function addChild(name) {
 }
 
 export async function getChilds() {
-  const { value } = await Storage.get({ key: "child1" });
+  const { value } = await Storage.get({ key: "children" });
+  return JSON.parse(value)
 }
 
+export async function removeChild(name) {
+  var
+}
 export async function clearData() {
   await Storage.remove({ key: "children" });
   console.log();
