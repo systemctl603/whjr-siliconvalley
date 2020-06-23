@@ -4,27 +4,26 @@ import * as Ionic from "@ionic/react";
 import * as Icons from "ionicons/icons";
 import { Plugins } from "@capacitor/core";
 import "./main.css";
-import ModalTemplate from "../components/modal";
+import AddPersonMenu from "../components/addPerson";
+import AddClassMenu from "../components/addClass"
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import { addChild, getChilds, clearData } from "../App";
+import { addPerson, getPersons, addClass } from "../App";
 
 function HomePage() {
-  getChilds();
   const { Storage, StatusBar } = Plugins;
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [showAddChildMenu, setShowAddChildMenu] = useState(false);
   const [childInName, setChildInName] = useState("");
   const [showAddClass, setShowAddClass] = useState(false);
   const [showAddProject, setShowAddProject] = useState(false);
-  StatusBar.hide();
   const Buttons = [
     {
       text: "Delete",
       role: "destructive",
       icon: Icons.trash,
       handler: () => {
-        clearData();
+        console.log("test")
       },
     },
     {
@@ -62,21 +61,6 @@ function HomePage() {
       role: "cancel",
     },
   ];
-  async function storeChild(keyval, jsonvalue) {
-    await Storage.set({
-      key: keyval,
-      value: JSON.stringify(jsonvalue),
-    });
-  }
-
-  async function getChildNum() {
-    var x = await Storage.get({ key: "childIndex" });
-    console.log(x);
-  }
-
-  function handleChange(event) {
-    setChildInName(event.target.value);
-  }
 
   return (
     <Ionic.IonPage>
@@ -101,34 +85,25 @@ function HomePage() {
           ></Ionic.IonActionSheet>
         </Ionic.IonFab>
 
-        <ModalTemplate
+        <AddPersonMenu
           hook={showAddChildMenu}
           hookChange={(val) => setShowAddChildMenu(val)}
-          hook2={(name) => {
-            setChildInName(name);
-            console.log(name);
-          }}
-          name="Child Name:"
-          title="Add Child"
           callback={(x) => {
-            addChild(x);
+            addPerson(x);
             setShowAddChildMenu(false);
           }}
         />
 
-        <ModalTemplate
+        <AddClassMenu
           hook={showAddClass}
           hookChange={(val) => setShowAddClass(val)}
-          hook2={(val) => setChildInName(val)}
-          name="Class Name:"
-          showDate="true"
-          datename="Due Date"
-          title="Add Class"
-          callback={(x) => {
+          callback={(title, date, notes) => {
+            var notifDate = new Date(date);
+            addClass(title, notifDate, notes)
             setShowAddClass(false);
           }}
         />
-        <ModalTemplate
+        {/* <ModalTemplate
           hook={showAddProject}
           hookChange={(val) => setShowAddProject(val)}
           name="Project Desc:"
@@ -137,7 +112,7 @@ function HomePage() {
           title="Add Project"
           inputType="textarea"
           callback={() => setShowAddProject(false)}
-        />
+        />*/ }
       </Ionic.IonContent>
     </Ionic.IonPage>
   );

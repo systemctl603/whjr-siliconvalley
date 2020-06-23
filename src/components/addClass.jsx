@@ -2,20 +2,7 @@ import React from "react";
 import * as Ionic from "@ionic/react";
 import * as Icons from "ionicons/icons";
 
-export default function ModalTemplate(props) {
-  var datetime;
-  if (props.showDate == "true") {
-    datetime = (
-      <Ionic.IonItem>
-        <Ionic.IonLabel>{props.datename}</Ionic.IonLabel>
-        <Ionic.IonDatetime
-          min="2000"
-          max="2040"
-          displayFormat="DDD. MMM DD, YY"
-        ></Ionic.IonDatetime>
-      </Ionic.IonItem>
-    );
-  }
+export default function AddClassMenu(props) {
   return (
     <Ionic.IonModal
       isOpen={props.hook}
@@ -23,7 +10,7 @@ export default function ModalTemplate(props) {
       onDidDismiss={() => props.hookChange(false)}
     >
       <Ionic.IonToolbar>
-        <Ionic.IonTitle>{props.title}</Ionic.IonTitle>
+        <Ionic.IonTitle>Add Class</Ionic.IonTitle>
         <hr />
         <Ionic.IonFabButton
           size="small"
@@ -35,23 +22,34 @@ export default function ModalTemplate(props) {
       </Ionic.IonToolbar>
       <form id="form">
         <Ionic.IonItem>
-          <Ionic.IonLabel>{props.name}</Ionic.IonLabel>
+          <Ionic.IonLabel>Name of class: </Ionic.IonLabel>
           <Ionic.IonInput id="input"></Ionic.IonInput>
           <br />
         </Ionic.IonItem>
         <Ionic.IonItem>
-          <Ionic.IonLabel>{props.datename}</Ionic.IonLabel>
+          <Ionic.IonLabel>Description: </Ionic.IonLabel>
+          <Ionic.IonInput id="notes"></Ionic.IonInput>
+          <br />
+        </Ionic.IonItem>
+
+
+        <Ionic.IonItem>
+          <Ionic.IonLabel>Class time: </Ionic.IonLabel>
           <Ionic.IonDatetime
-            min="2000"
+            id="date"
+            min="2020"
             max="2040"
-            displayFormat="MMM DD, YYYY HH:mm"
+            displayFormat="MMM DD, YYYY hh:mm A"
           ></Ionic.IonDatetime>
         </Ionic.IonItem>
 
         <Ionic.IonButton
           expand="full"
           onClick={() => {
-            props.callback();
+            var input = document.getElementById("input").value;
+            var date = document.getElementById("date").value;
+            var notes = document.getElementById("notes").value; 
+            props.callback(input, date, notes);
           }}
         >
           Submit

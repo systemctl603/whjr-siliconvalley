@@ -62,6 +62,9 @@ export function register(config?: Config) {
   }
 }
 
+function adsf() {
+return 1+1
+}
 function registerValidSW(swUrl: string, config?: Config) {
   navigator.serviceWorker
     .register(swUrl)
