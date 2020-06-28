@@ -5,10 +5,11 @@ import * as Icons from "ionicons/icons";
 import { Plugins } from "@capacitor/core";
 import "./main.css";
 import AddPersonMenu from "../components/addPerson";
-import AddClassMenu from "../components/addClass"
+import AddClassMenu from "../components/addClass";
+import AddProjectMenu from "../components/addProject"
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import { addPerson, getPersons, addClass } from "../App";
+import { addPerson, getPersons } from "../App";
 
 function HomePage() {
   const { Storage, StatusBar } = Plugins;
@@ -98,21 +99,16 @@ function HomePage() {
           hook={showAddClass}
           hookChange={(val) => setShowAddClass(val)}
           callback={(title, date, notes) => {
-            var notifDate = new Date(date);
-            addClass(title, notifDate, notes)
             setShowAddClass(false);
           }}
         />
-        {/* <ModalTemplate
+        <AddProjectMenu
           hook={showAddProject}
           hookChange={(val) => setShowAddProject(val)}
-          name="Project Desc:"
-          showDate="true"
-          datename="Due Date"
-          title="Add Project"
-          inputType="textarea"
-          callback={() => setShowAddProject(false)}
-        />*/ }
+          callback={() => {
+            setShowAddProject(false);
+          }}
+        />
       </Ionic.IonContent>
     </Ionic.IonPage>
   );

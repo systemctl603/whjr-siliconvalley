@@ -67,7 +67,21 @@ export async function clearData() {
   console.log();
 }
 
-export async function addClass(title, date, notes) {
+/*export async function addClass(title, date, notes) {
+  var { value } = await Storage.get({ key: "events" })
+  if (value == null) {
+    value = {};
+    value.projects = [];
+    value.classes = [];
+  };
+  value.classes.forEach(element => {
+    if (element.date.getTime() - date.getTime() <= 7200000 ||
+      element.date.getTime() - date.getTime() >= -7200000 ) {
+
+      exceptions.push(element);
+    } 
+  })
+  value.classes.push({title: title, date: date}) 
   const notifs = await LocalNotifications.schedule({
     notifications: [
       {
@@ -82,7 +96,7 @@ export async function addClass(title, date, notes) {
       }
     ]
   })
-}
+}*/
 export const App = () => (
   <IonApp>
     <IonReactRouter>
