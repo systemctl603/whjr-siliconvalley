@@ -66,37 +66,6 @@ export async function clearData() {
   await Storage.remove({ key: "people" });
   console.log();
 }
-
-/*export async function addClass(title, date, notes) {
-  var { value } = await Storage.get({ key: "events" })
-  if (value == null) {
-    value = {};
-    value.projects = [];
-    value.classes = [];
-  };
-  value.classes.forEach(element => {
-    if (element.date.getTime() - date.getTime() <= 7200000 ||
-      element.date.getTime() - date.getTime() >= -7200000 ) {
-
-      exceptions.push(element);
-    } 
-  })
-  value.classes.push({title: title, date: date}) 
-  const notifs = await LocalNotifications.schedule({
-    notifications: [
-      {
-        title: title,
-        body: notes,
-        id: 1,
-        schedule: { at: date },
-        sound: null,
-        attachments: null,
-        actionTypeId: "",
-        extra: null
-      }
-    ]
-  })
-}*/
 export const App = () => (
   <IonApp>
     <IonReactRouter>
@@ -109,3 +78,6 @@ export const App = () => (
     </IonReactRouter>
   </IonApp>
 );
+
+
+
