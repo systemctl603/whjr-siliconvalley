@@ -79,11 +79,11 @@ export default function AddClassMenu(props) {
           buttons={[
             {
               text: "Cancel",
-              role: "cancel",
-              handler: () => {
-                console.log(intersectingClasses);
-                setShowAlert(false);
-              }
+                role: "cancel",
+                handler: () => {
+                  console.log(intersectingClasses);
+                  setShowAlert(false);
+                }
             },
             {
               text: "OK",
@@ -105,48 +105,50 @@ export default function AddClassMenu(props) {
             var notes = document.getElementById("notes").value; 
             date = Date.parse(date);
 
-            var { value } = await Storage.get({ key: "events" })
-            value = JSON.parse(value);
-            if (value == null) {
-              value = {};
-              value.projects = [];
-              value.classes = [];
-            };
-            var exceptions = [];
-            value.classes.forEach(element => {
-              console.log(element.date);
-              console.log(date);
-              var test = element.date - date;
-              if (test >= -7200000 && test <= 7200000) {
-                exceptions.push(element);
-              } 
-            })
-            if (exceptions.length == 0) {
-              value.classes.push({title: title, date: date});
-              console.log(exceptions);
-              date = new Date(date);
-              console.log(date);
-              const notifs = await LocalNotifications.schedule({
-                notifications: [
-                  {
-                    title: title,
-                    body: notes,
-                    id: 1,
-                    schedule: { at: date },
-                    sound: null,
-                    attachments: null,
-                    actionTypeId: "",
-                    extra: null
-                  }
-                ]
+            if () {
+              var { value } = await Storage.get({ key: "events" })
+              value = JSON.parse(value);
+              if (value == null) {
+                value = {};
+                value.projects = [];
+                value.classes = [];
+              };
+              var exceptions = [];
+              value.classes.forEach(element => {
+                console.log(element.date);
+                console.log(date);
+                var test = element.date - date;
+                if (test >= -7200000 && test <= 7200000) {
+                  exceptions.push(element);
+                } 
               })
-              await Storage.set({key: "events", value: JSON.stringify(value)})
-            } else {
-              setIntersectingClasses(exceptions);
-              console.log(exceptions);
-              setShowAlert(true);
-            }
-          }}
+              if (exceptions.length == 0) {
+                value.classes.push({title: title, date: date});
+                console.log(exceptions);
+                date = new Date(date);
+                console.log(date);
+                const notifs = await LocalNotifications.schedule({
+                  notifications: [
+                    {
+                      title: title,
+                      body: notes,
+                      id: 1,
+                      schedule: { at: date },
+                      sound: null,
+                      attachments: null,
+                      actionTypeId: "",
+                      extra: null
+                    }
+                  ]
+                })
+                await Storage.set({key: "events", value: JSON.stringify(value)})
+              } else {
+                setIntersectingClasses(exceptions);
+                console.log(exceptions);
+                setShowAlert(true);
+              }
+            }}
+          }
         >
           Submit
         </Ionic.IonButton>
