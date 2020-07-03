@@ -1,0 +1,11 @@
+x (B) Add cards to home page @main.jsx
+(B) Allow cards to work without refresh
+(B) Add recurring classes @addClass.jsx
+x (B) Add ending time to conflict and UI @addClass.jsx
+
+(C) Split the menu @main.jsx
+(C) No null fields @addClass.jsx @addProject.jsx
+(C) Disable booking for previous time @addClass.jsx @addProject.jsx
+
+(Z) Add multiple people @addClass.jsx +LeastImportant
+(Z) Find duration instead of end time +LeastImportant

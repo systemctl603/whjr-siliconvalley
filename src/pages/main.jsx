@@ -11,13 +11,24 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { addPerson, getPersons } from "../App";
 
+const {Storage} = Plugins;
+
+var pendingarr = [];
+async function getPending() {
+  var tmparr = (await Storage.get({key: "events"})).value;
+  tmparr = JSON.parse(tmparr)
+  pendingarr = tmparr.classes
+}
+getPending();
+
 function HomePage() {
-  const { Storage, StatusBar } = Plugins;
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [showAddChildMenu, setShowAddChildMenu] = useState(false);
   const [childInName, setChildInName] = useState("");
   const [showAddClass, setShowAddClass] = useState(false);
   const [showAddProject, setShowAddProject] = useState(false);
+  const [dateClicked, setDateClicked] = useState(new Date());
+  getPending();
   const Buttons = [
     {
       text: "Delete",
@@ -71,8 +82,20 @@ function HomePage() {
         </Ionic.IonToolbar>
       </Ionic.IonHeader>
       <div class="calendar">
-        <Calendar />
+        <Calendar onChange={setDateClicked}/>
       </div>
+      {pendingarr.map(element => {
+        var date = new Date(element.date);
+        console.log(date, dateClicked)
+        if (dateClicked.toDateString() === date.toDateString()) {
+          return (
+            <Ionic.IonItem>
+              <Ionic.IonLabel>{element.title}</Ionic.IonLabel>
+              <Ionic.IonLabel>{date.toDateString()}</Ionic.IonLabel>
+            </Ionic.IonItem>
+          );
+        }
+      })}
       <Ionic.IonContent>
         <Ionic.IonFab vertical="bottom" horizontal="end" slot="fixed">
           <Ionic.IonFabButton onClick={() => setShowActionSheet(true)}>
