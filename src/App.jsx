@@ -3,7 +3,6 @@ import { IonApp, IonRouterOutlet, IonTabBar, IonTabs } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import HomePage from "./pages/main.jsx";
 import { Plugins } from "@capacitor/core";
-
 import "@ionic/react/css/core.css";
 import "@ionic/react/css/normalize.css";
 import "@ionic/react/css/structure.css";
@@ -19,10 +18,51 @@ import "@ionic/react/css/display.css";
 import "./theme/variables.css";
 const { Storage, LocalNotifications } = Plugins;
 
+var events;
+async function getEvents() {
+  var eventarr = (await Storage.get({ key: "events" })).value;
+  console.log(eventarr);
+  eventarr = JSON.parse(eventarr);
+  events = eventarr;
+}
+getEvents();
+
+async function saveToEvents(arr) {
+  console.log(JSON.stringify(arr));
+  await Storage.set({
+    key: "events",
+    value: JSON.stringify(arr),
+  });
+}
+
+for (var key in events) {
+  key.filter((element) => {
+    var date = new Date(element.date);
+    var currentDate = new Date();
+    if (date < currentDate) {
+      return false;
+    } else {
+      return true;
+    }
+  });
+}
+saveToEvents(events);
+
 async function fetchPeopleNum() {
   var { value } = await Storage.get({ key: "peoplenum" });
   value == null ? (value = 0) : (value = parseInt(value));
   return value;
+}
+
+export function getDaysBetween(start, end) {
+  for (
+    var arr = [], dt = new Date(start);
+    dt <= end;
+    dt.setDate(dt.getDate() + 1)
+  ) {
+    arr.push(new Date(dt));
+  }
+  return arr;
 }
 
 export async function addPerson(name) {
