@@ -4,7 +4,6 @@ import { IonReactRouter } from "@ionic/react-router";
 import HomePage from "./pages/main.jsx";
 import { Plugins } from "@capacitor/core";
 
-
 import "@ionic/react/css/core.css";
 import "@ionic/react/css/normalize.css";
 import "@ionic/react/css/structure.css";
@@ -18,7 +17,7 @@ import "@ionic/react/css/display.css";
 
 /* Theme variables */
 import "./theme/variables.css";
-const { Storage, LocalNotifications} = Plugins;
+const { Storage, LocalNotifications } = Plugins;
 
 async function fetchPeopleNum() {
   var { value } = await Storage.get({ key: "peoplenum" });
@@ -39,7 +38,7 @@ export async function addPerson(name) {
   value.push(name);
   await Storage.set({
     key: "people",
-    value: JSON.stringify(value)
+    value: JSON.stringify(value),
   });
 }
 
@@ -55,7 +54,7 @@ export async function removePerson(name) {
     personarr.splice(idx, 1);
     await Storage.set({
       key: "people",
-      value: JSON.stringify(personarr)
+      value: JSON.stringify(personarr),
     });
   } else {
     return "Not in array";
@@ -67,36 +66,6 @@ export async function clearData() {
   console.log();
 }
 
-/*export async function addClass(title, date, notes) {
-  var { value } = await Storage.get({ key: "events" })
-  if (value == null) {
-    value = {};
-    value.projects = [];
-    value.classes = [];
-  };
-  value.classes.forEach(element => {
-    if (element.date.getTime() - date.getTime() <= 7200000 ||
-      element.date.getTime() - date.getTime() >= -7200000 ) {
-
-      exceptions.push(element);
-    } 
-  })
-  value.classes.push({title: title, date: date}) 
-  const notifs = await LocalNotifications.schedule({
-    notifications: [
-      {
-        title: title,
-        body: notes,
-        id: 1,
-        schedule: { at: date },
-        sound: null,
-        attachments: null,
-        actionTypeId: "",
-        extra: null
-      }
-    ]
-  })
-}*/
 export const App = () => (
   <IonApp>
     <IonReactRouter>

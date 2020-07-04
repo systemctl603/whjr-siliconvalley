@@ -6,7 +6,7 @@ import { Plugins } from "@capacitor/core";
 import "./main.css";
 import AddPersonMenu from "../components/addPerson";
 import AddClassMenu from "../components/addClass";
-import AddProjectMenu from "../components/addProject"
+import AddProjectMenu from "../components/addProject";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { addPerson, getPersons } from "../App";
@@ -24,7 +24,7 @@ function HomePage() {
       role: "destructive",
       icon: Icons.trash,
       handler: () => {
-        console.log("test")
+        console.log("test");
       },
     },
     {
