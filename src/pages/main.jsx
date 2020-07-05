@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as Ionic from "@ionic/react";
 import * as Icons from "ionicons/icons";
 import { Plugins } from "@capacitor/core";
@@ -11,24 +10,34 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { addPerson, getPersons } from "../App";
 
-const {Storage} = Plugins;
-
+const { Storage } = Plugins;
 var pendingarr = [];
-async function getPending() {
-  var tmparr = (await Storage.get({key: "events"})).value;
-  tmparr = JSON.parse(tmparr)
-  pendingarr = tmparr.classes
-}
-getPending();
 
+async function updateCardView() {
+  var tmparr = (await Storage.get({ key: "events" })).value;
+  console.log(tmparr);
+  tmparr = JSON.parse(tmparr);
+  pendingarr = tmparr.classes;
+  pendingarr.sort((a, b) => {
+    var date1 = new Date(a.date);
+    var date2 = new Date(b.date);
+    if (date1 < date2) {
+      return -1;
+    } else if (date1 > date2) {
+      return 1;
+    }
+    return 0;
+  });
+  console.log(pendingarr);
+}
+updateCardView();
 function HomePage() {
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [showAddChildMenu, setShowAddChildMenu] = useState(false);
-  const [childInName, setChildInName] = useState("");
+  const [cardView, setCardView] = useState([]);
   const [showAddClass, setShowAddClass] = useState(false);
   const [showAddProject, setShowAddProject] = useState(false);
   const [dateClicked, setDateClicked] = useState(new Date());
-  getPending();
   const Buttons = [
     {
       text: "Delete",
@@ -67,11 +76,7 @@ function HomePage() {
         setShowAddProject(true);
       },
     },
-    {
-      text: "Cancel",
-      icon: Icons.close,
-      role: "cancel",
-    },
+    { text: "Cancel", icon: Icons.close, role: "cancel" },
   ];
 
   return (
@@ -82,16 +87,17 @@ function HomePage() {
         </Ionic.IonToolbar>
       </Ionic.IonHeader>
       <div class="calendar">
-        <Calendar onChange={setDateClicked}/>
+        <Calendar onChange={setDateClicked} value={dateClicked} />
       </div>
-      {pendingarr.map(element => {
+
+      {pendingarr.map((element) => {
         var date = new Date(element.date);
-        console.log(date, dateClicked)
+        console.log(date, dateClicked);
         if (dateClicked.toDateString() === date.toDateString()) {
           return (
             <Ionic.IonItem>
               <Ionic.IonLabel>{element.title}</Ionic.IonLabel>
-              <Ionic.IonLabel>{date.toDateString()}</Ionic.IonLabel>
+              <Ionic.IonLabel>{date.toLocaleString()}</Ionic.IonLabel>
             </Ionic.IonItem>
           );
         }
@@ -108,7 +114,6 @@ function HomePage() {
             buttons={Buttons}
           ></Ionic.IonActionSheet>
         </Ionic.IonFab>
-
         <AddPersonMenu
           hook={showAddChildMenu}
           hookChange={(val) => setShowAddChildMenu(val)}
@@ -117,12 +122,12 @@ function HomePage() {
             setShowAddChildMenu(false);
           }}
         />
-
         <AddClassMenu
           hook={showAddClass}
           hookChange={(val) => setShowAddClass(val)}
-          callback={(title, date, notes) => {
+          callback={() => {
             setShowAddClass(false);
+            updateCardView();
           }}
         />
         <AddProjectMenu

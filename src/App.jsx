@@ -18,36 +18,6 @@ import "@ionic/react/css/display.css";
 import "./theme/variables.css";
 const { Storage, LocalNotifications } = Plugins;
 
-var events;
-async function getEvents() {
-  var eventarr = (await Storage.get({ key: "events" })).value;
-  console.log(eventarr);
-  eventarr = JSON.parse(eventarr);
-  events = eventarr;
-}
-getEvents();
-
-async function saveToEvents(arr) {
-  console.log(JSON.stringify(arr));
-  await Storage.set({
-    key: "events",
-    value: JSON.stringify(arr),
-  });
-}
-
-for (var key in events) {
-  key.filter((element) => {
-    var date = new Date(element.date);
-    var currentDate = new Date();
-    if (date < currentDate) {
-      return false;
-    } else {
-      return true;
-    }
-  });
-}
-saveToEvents(events);
-
 async function fetchPeopleNum() {
   var { value } = await Storage.get({ key: "peoplenum" });
   value == null ? (value = 0) : (value = parseInt(value));
