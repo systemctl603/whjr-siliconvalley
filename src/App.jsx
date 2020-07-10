@@ -75,7 +75,6 @@ export async function clearData() {
   await Storage.remove({ key: "people" });
   console.log();
 }
-
 export const App = () => (
   <IonApp>
     <IonReactRouter>

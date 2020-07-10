@@ -4,6 +4,7 @@ import * as Icons from "ionicons/icons";
 import { Plugins } from "@capacitor/core";
 
 const { Storage, LocalNotifications } = Plugins;
+
 export default function AddProjectMenu(props) {
   return (
     <Ionic.IonModal
@@ -12,7 +13,7 @@ export default function AddProjectMenu(props) {
       onDidDismiss={() => props.hookChange(false)}
     >
       <Ionic.IonToolbar>
-        <Ionic.IonTitle>Add Project</Ionic.IonTitle>
+        <Ionic.IonTitle>Add Reminder</Ionic.IonTitle>
         <hr />
         <Ionic.IonFabButton
           size="small"
@@ -24,12 +25,12 @@ export default function AddProjectMenu(props) {
       </Ionic.IonToolbar>
       <form id="form">
         <Ionic.IonItem>
-          <Ionic.IonLabel>Project Name: </Ionic.IonLabel>
+          <Ionic.IonLabel>Reminder Name: </Ionic.IonLabel>
           <Ionic.IonInput id="title"></Ionic.IonInput>
           <br />
         </Ionic.IonItem>
         <Ionic.IonItem>
-          <Ionic.IonLabel>Due Date:</Ionic.IonLabel>
+          <Ionic.IonLabel>Date: </Ionic.IonLabel>
           <Ionic.IonDatetime
             min="2000"
             max="2040"
@@ -43,19 +44,48 @@ export default function AddProjectMenu(props) {
           onClick={async () => {
             var datetime = document.getElementById("datetime").value;
             var title = document.getElementById("title").value;
+            var { value } = await Storage.get({ key: "events" });
+            var id = await Storage.get({ key: "nextid" });
+            id.value === null ? (id = 1) : (id = parseInt(id.value));
+            if (value === null) {
+              value = {};
+              value.classes = [];
+              value.projects = [];
+              await Storage.set({
+                key: "events",
+                value: JSON.stringify(value),
+              });
+            } else {
+              value = JSON.parse(value);
+            }
+            value.projects.push({
+              title: title,
+              date: datetime,
+              id: id,
+            });
+
             const notifs = await LocalNotifications.schedule({
               notifications: [
                 {
-                  title: `Project - ${title}`,
+                  title: `Reminder - ${title}`,
                   body: "",
-                  id: 1,
+                  id: id,
                   schedule: { at: new Date(datetime) },
                   sound: null,
                   attachments: null,
                   actionTypeId: "",
-                  extra: null
-                }
-              ]
+                  extra: null,
+                },
+              ],
+            });
+            id++;
+            await Storage.set({
+              key: "nextid",
+              value: id.toString(),
+            });
+            await Storage.set({
+              key: "events",
+              value: JSON.stringify(value),
             });
           }}
         >
