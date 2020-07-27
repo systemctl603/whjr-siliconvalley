@@ -44,6 +44,15 @@ export default function AddProjectMenu(props) {
           onClick={async () => {
             var datetime = document.getElementById("datetime").value;
             var title = document.getElementById("title").value;
+
+            if (datetime === undefined || title === "") {
+              window.alert("Some fields are empty");
+              return;
+            } else if (new Date(datetime) < new Date()) {
+              window.alert("Date is not valid");
+              return;
+            }
+
             var { value } = await Storage.get({ key: "events" });
             var id = await Storage.get({ key: "nextid" });
             id.value === null ? (id = 1) : (id = parseInt(id.value));
@@ -87,6 +96,7 @@ export default function AddProjectMenu(props) {
               key: "events",
               value: JSON.stringify(value),
             });
+            props.callback();
           }}
         >
           Submit

@@ -1,6 +1,6 @@
 {
-  "appId": "io.ionic.starter",
-  "appName": "schoolschedule",
+  "appId": "com.systemctl603.familyschedule",
+  "appName": "Family Scheduler",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "build",

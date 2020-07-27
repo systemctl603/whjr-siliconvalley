@@ -78,7 +78,7 @@ export default function AddClassMenu(props) {
           slot="end"
           onClick={() => props.hookChange(false)}
         >
-          <Ionic.IonIcon icon={Icons.exitOutline}></Ionic.IonIcon>{" "}
+          <Ionic.IonIcon icon={Icons.exitOutline}></Ionic.IonIcon>
         </Ionic.IonFabButton>
       </Ionic.IonToolbar>
       <form id="form">
@@ -196,16 +196,13 @@ export default function AddClassMenu(props) {
               endtime === undefined ||
               date === undefined
             ) {
-              setErrMsg("Some fields are empty");
-              setShowFieldAlert(true);
+              window.alert("Some fields are empty");
               return;
             } else if (new Date(date) < new Date()) {
-              setErrMsg("Date is not valid");
-              setShowFieldAlert(true);
+              window.alert("Date is not valid");
               return;
             } else if (new Date(endtime) <= new Date(date)) {
-              setErrMsg("Endtime is before start");
-              setShowFieldAlert(true);
+              window.alert("Endtime is before start");
               return;
             }
             console.log(date, endtime);
@@ -244,14 +241,15 @@ export default function AddClassMenu(props) {
               });
               console.log(exceptions);
               date = new Date(date);
-              console.log(date);
+              var d = date;
+              d.setHours(d.getHours() - 1);
               const notifs = await LocalNotifications.schedule({
                 notifications: [
                   {
                     title: title,
                     body: notes,
                     id: id,
-                    schedule: { at: date },
+                    schedule: { at: d },
                     sound: null,
                     attachments: null,
                     actionTypeId: "",
@@ -267,9 +265,16 @@ export default function AddClassMenu(props) {
               await Storage.set({ key: "nextid", value: id.toString() });
               props.callback();
             } else {
-              setIntersectingClasses(exceptions);
-              console.log(exceptions);
-              setShowAlert(true);
+              var res = window.confirm(
+                `You have a class at this time:\n${exceptions
+                  .map(({ title, date }) => {
+                    return `${title} on ${new Date(date).toLocaleString()}\n`;
+                  })
+                  .join("")}`
+              );
+              if (res) {
+                scheduleNotification(title, date, notes, person, endtime);
+              }
             }
           }}
         >

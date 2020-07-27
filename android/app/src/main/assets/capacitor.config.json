@@ -1,9 +1,8 @@
 {
-  "appId": "io.ionic.starter",
-  "appName": "schoolschedule",
+  "appId": "com.systemctl603.familyschedule",
+  "appName": "Family Scheduler",
   "bundledWebRuntime": false,
-  "linuxAndroidStudioPath": "/usr/bin/android-studio",
-  "npmClient": "yarn",
+  "npmClient": "npm",
   "webDir": "build",
   "plugins": {
     "SplashScreen": {

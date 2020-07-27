@@ -2,21 +2,20 @@ import React, { useEffect, useState } from "react";
 import * as Ionic from "@ionic/react";
 import * as Icons from "ionicons/icons";
 import { Plugins } from "@capacitor/core";
-import "./main.css";
 import AddPersonMenu from "../components/addPerson";
 import AddClassMenu from "../components/addClass";
 import AddProjectMenu from "../components/addProject";
+import AddRecurringClass from "../components/addRecurringClass";
 import EditClass from "../components/editClass";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import ScrollArea from "react-scrollbar";
-import { addPerson, getPersons } from "../App";
-import { eventNames } from "process";
+import "./main.css";
+import "react-calendar/dist/Calendar.css";
 
 const { Storage, LocalNotifications, Modals } = Plugins;
 var pendingarr = [];
 var projectarr = [];
-
 async function updateCardView() {
   var tmparr = (await Storage.get({ key: "events" })).value;
   if (tmparr !== null) {
@@ -69,6 +68,13 @@ function RemovePerson(props) {
     >
       <Ionic.IonToolbar>
         <Ionic.IonTitle>Remove Person</Ionic.IonTitle>
+        <Ionic.IonFabButton
+          size="small"
+          slot="end"
+          onClick={() => props.hookChange(false)}
+        >
+          <Ionic.IonIcon icon={Icons.exitOutline}></Ionic.IonIcon>
+        </Ionic.IonFabButton>
       </Ionic.IonToolbar>
 
       <form id="form">
@@ -92,15 +98,13 @@ function RemovePerson(props) {
           expand="full"
           onClick={async () => {
             if (person === "") {
-              await Modals.alert({
-                message: "Please fill in the field",
-              });
+              window.alert("Please choose a person");
               return;
             }
-            var res = await Modals.confirm({
-              message: "This will delete all events with this person.",
-            });
-            if (res.value === true) {
+            var res = window.confirm(
+              "This will delete all events associated with this person"
+            );
+            if (res === true) {
               var peoplearr = JSON.parse(
                 (await Storage.get({ key: "people" })).value
               );
@@ -130,6 +134,7 @@ function RemovePerson(props) {
                 value: JSON.stringify(events),
               });
             }
+            props.hookChange(false);
           }}
         >
           Delete
@@ -145,9 +150,13 @@ function HomePage() {
   const [showAddProject, setShowAddProject] = useState(false);
   const [showEditMenu, setShowEditMenu] = useState(false);
   const [dateClicked, setDateClicked] = useState(new Date());
-  const [showModifMenu, setShowModifMenu] = useState(false);
   const [showPersonMenu, setShowPersonMenu] = useState(false);
   const [editId, setEditId] = useState(1);
+
+  useEffect(() => {
+    setDateClicked(new Date("1/1/1970"));
+    setTimeout(() => setDateClicked(new Date()), 0);
+  }, []);
 
   updateCardView();
   const Buttons = [
@@ -186,14 +195,13 @@ function HomePage() {
     <Ionic.IonPage>
       <Ionic.IonHeader>
         <Ionic.IonToolbar>
-          <Ionic.IonTitle>Home</Ionic.IonTitle>
+          <Ionic.IonTitle>Family Scheduler</Ionic.IonTitle>
         </Ionic.IonToolbar>
       </Ionic.IonHeader>
-      <Calendar
-        className="calendar"
-        onChange={setDateClicked}
-        value={dateClicked}
-      />
+
+      <div className="calender">
+        <Calendar onChange={setDateClicked} value={dateClicked} />
+      </div>
       <ScrollArea>
         {pendingarr.map((element) => {
           var date = new Date(element.date);
@@ -207,7 +215,19 @@ function HomePage() {
                   <Ionic.IonCardSubtitle>Event</Ionic.IonCardSubtitle>
                 </Ionic.IonCardHeader>
                 <Ionic.IonCardContent>
-                  {date.toLocaleString()} to {endtime.toLocaleString()}
+                  <strong>
+                    {date.toLocaleString("en-US", {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })}
+                  </strong>{" "}
+                  to{" "}
+                  <strong>
+                    {endtime.toLocaleString("en-US", {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })}
+                  </strong>
                 </Ionic.IonCardContent>
                 <Ionic.IonCardContent>{element.notes}</Ionic.IonCardContent>
                 <Ionic.IonCardContent>
@@ -230,12 +250,11 @@ function HomePage() {
                       var idx = value.classes.indexOf(obj);
                       value.classes.splice(idx, 1);
                       console.log(value);
-                      var res = await Modals.confirm({
-                        title: "Delete",
-                        message: "Are you sure you want to delete this",
-                      });
+                      var res = window.confirm(
+                        "Are you sure you want to delete this"
+                      );
                       console.log(res);
-                      if (res.value === true) {
+                      if (res === true) {
                         await Storage.set({
                           key: "events",
                           value: JSON.stringify(value),
@@ -292,12 +311,11 @@ function HomePage() {
                       var idx = value.projects.indexOf(obj);
                       value.projects.splice(idx, 1);
                       console.log(value);
-                      var res = await Modals.confirm({
-                        title: "Delete",
-                        message: "Are you sure you want to delete this",
-                      });
+                      var res = window.confirm(
+                        "Are you sure you want to delete this"
+                      );
                       console.log(res);
-                      if (res.value === true) {
+                      if (res === true) {
                         await Storage.set({
                           key: "events",
                           value: JSON.stringify(value),
@@ -338,12 +356,15 @@ function HomePage() {
             if (value == null) value = [];
             console.log(value, typeof value);
             var exitStatus = 0;
+            if (x === "") {
+              window.alert("Some fields were not filled in");
+              return;
+            }
             value.forEach(async (el) => {
               if (el === x) {
                 exitStatus = 1;
-                await Modals.alert({
-                  message: "Person already exists",
-                });
+                window.alert("Person already exists");
+                return;
               }
             });
             if (exitStatus !== 1) {
@@ -363,7 +384,7 @@ function HomePage() {
             setShowAddClass(false);
             var prevDate = dateClicked;
             setDateClicked(new Date("1/1/1970"));
-            setTimeout(() => setDateClicked(prevDate), 25);
+            setTimeout(() => setDateClicked(prevDate), 0);
           }}
         />
         <AddProjectMenu
@@ -371,9 +392,11 @@ function HomePage() {
           hookChange={(val) => setShowAddProject(val)}
           callback={() => {
             setShowAddProject(false);
+            var prevDate = dateClicked;
+            setDateClicked(new Date("1/1/1970"));
+            setTimeout(() => setDateClicked(prevDate), 0);
           }}
         />
-
         <EditClass
           hook={showEditMenu}
           hookChange={(val) => setShowEditMenu(val)}
@@ -382,10 +405,9 @@ function HomePage() {
             setShowEditMenu(false);
             var prevDate = dateClicked;
             setDateClicked(new Date("1/1/1970"));
-            setTimeout(() => setDateClicked(prevDate), 25);
+            setTimeout(() => setDateClicked(prevDate), 0);
           }}
         />
-
         <RemovePerson
           hook={showPersonMenu}
           hookChange={(val) => {

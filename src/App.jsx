@@ -20,7 +20,7 @@ const { Storage, LocalNotifications } = Plugins;
 
 async function fetchPeopleNum() {
   var { value } = await Storage.get({ key: "peoplenum" });
-  value == null ? (value = 0) : (value = parseInt(value));
+  value === null ? (value = 0) : (value = parseInt(value));
   return value;
 }
 
@@ -77,13 +77,6 @@ export async function clearData() {
 }
 export const App = () => (
   <IonApp>
-    <IonReactRouter>
-      <IonTabs>
-        <IonRouterOutlet>
-          <HomePage />
-        </IonRouterOutlet>
-        <IonTabBar slot="bottom"></IonTabBar>
-      </IonTabs>
-    </IonReactRouter>
+    <HomePage />
   </IonApp>
 );
