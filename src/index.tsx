@@ -7,9 +7,9 @@ import filterEvents from "./methods";
 
 const { Storage } = Plugins;
 
-filterEvents().then(() =>
-  ReactDOM.render(<App />, document.getElementById("root"))
-);
+filterEvents().then(() => {
+  ReactDOM.render(<App />, document.getElementById("root"));
+});
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

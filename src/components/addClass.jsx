@@ -16,12 +16,7 @@ async function getPeople() {
 }
 
 export default function AddClassMenu(props) {
-  const [showAlert, setShowAlert] = useState(false);
-  const [intersectingClasses, setIntersectingClasses] = useState(["test"]);
-  const [recurring, setRecurring] = useState(false);
-  const [showFieldAlert, setShowFieldAlert] = useState(false);
   const [person, setPerson] = useState("");
-  const [errMsg, setErrMsg] = useState("");
   const scheduleNotification = async (title, date, notes, person, endtime) => {
     var { value } = await Storage.get({ key: "events" });
     var id = (await Storage.get({ key: "nextid" })).value;
@@ -124,55 +119,6 @@ export default function AddClassMenu(props) {
             })}
           </Ionic.IonSelect>
         </Ionic.IonItem>
-        <Ionic.IonAlert
-          isOpen={showAlert}
-          onDidDismiss={() => {
-            setShowAlert(false);
-          }}
-          header={"Are you sure you want to book?"}
-          message={`You have a class at this time:\n ${intersectingClasses.map(
-            (element) => {
-              return `${element.title} on ${new Date(
-                element.date
-              ).toLocaleString()}`;
-            }
-          )}`}
-          buttons={[
-            {
-              text: "Cancel",
-              role: "cancel",
-              handler: () => {
-                console.log(intersectingClasses);
-                setShowAlert(false);
-              },
-            },
-            {
-              text: "OK",
-              handler: () => {
-                var title = document.getElementById("title").value;
-                var date = document.getElementById("date").value;
-                var notes = document.getElementById("notes").value;
-                var endtime = document.getElementById("enddate").value;
-                scheduleNotification(title, date, notes, person, endtime);
-              },
-            },
-          ]}
-        />
-        <Ionic.IonAlert
-          isOpen={showFieldAlert}
-          onDidDismiss={() => {
-            setShowFieldAlert(false);
-          }}
-          header={errMsg}
-          buttons={[
-            {
-              text: "OK",
-              handler: () => {
-                setShowFieldAlert(false);
-              },
-            },
-          ]}
-        />
         <Ionic.IonButton
           expand="full"
           onClick={async () => {
