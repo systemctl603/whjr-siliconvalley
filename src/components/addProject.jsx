@@ -35,15 +35,26 @@ export default function AddProjectMenu(props) {
             min="2000"
             max="2040"
             id="datetime"
-            displayFormat="MMM DD, YYYY hh:mm A"
+            displayFormat="MMM DD hh:mm A"
           ></Ionic.IonDatetime>
         </Ionic.IonItem>
 
+        <Ionic.IonItem>
+          <Ionic.IonLabel>Year (Optional for current year):</Ionic.IonLabel>
+          <Ionic.IonDatetime
+            id="year"
+            min={new Date().toISOString()}
+            max="2040"
+            displayFormat="YYYY"
+          ></Ionic.IonDatetime>
+        </Ionic.IonItem>
         <Ionic.IonButton
           expand="full"
           onClick={async () => {
             var datetime = document.getElementById("datetime").value;
             var title = document.getElementById("title").value;
+            var year = document.getElementById("year").value;
+            year === undefined ? (year = new Date()) : (year = new Date(year));
 
             if (datetime === undefined || title === "") {
               window.alert("Some fields are empty");
@@ -52,6 +63,9 @@ export default function AddProjectMenu(props) {
               window.alert("Date is not valid");
               return;
             }
+
+            datetime = new Date(datetime);
+            datetime.setFullYear(year.getFullYear());
 
             var { value } = await Storage.get({ key: "events" });
             var id = await Storage.get({ key: "nextid" });

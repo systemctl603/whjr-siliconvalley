@@ -32,7 +32,7 @@ async function getPeople() {
 export default function AddRecurringClass(props) {
   const [person, setPerson] = useState("");
   const [dayOfWeek, setDayOfWeek] = useState("");
-  const [months, setMonths] = useState(1);
+  const [months, setMonths] = useState(5);
   getPeople();
   return (
     <Ionic.IonModal
@@ -191,7 +191,9 @@ export default function AddRecurringClass(props) {
               title === "" ||
               person === "" ||
               endtime === undefined ||
-              date === undefined
+              date === undefined ||
+              dayOfWeek === "" ||
+              months === 5
             ) {
               window.alert("Some fields are empty");
               return;
@@ -222,9 +224,15 @@ export default function AddRecurringClass(props) {
 
             if (exceptions.length !== 0) {
               var res = window.confirm(
-                `You have a class at this time:\n${exceptions
+                `Do you want to continue booking? \n Conflicts\n${exceptions
                   .map(({ title, date }) => {
-                    return `${title} on ${new Date(date).toLocaleString()}\n`;
+                    return `${title} on ${new Date(date).toLocaleString(
+                      "en-US",
+                      {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      }
+                    )}\n`;
                   })
                   .join("")}`
               );
@@ -241,13 +249,16 @@ export default function AddRecurringClass(props) {
                   id: id,
                 });
 
+                date = new Date(date);
+                var d = date;
+                d.setHours(d.getHours() - 1);
                 const notifs = await LocalNotifications.schedule({
                   notifications: [
                     {
                       title: title,
                       body: notes,
                       id: id,
-                      schedule: { at: date },
+                      schedule: { at: d },
                       sound: null,
                       attachments: null,
                       actionTypeId: "",

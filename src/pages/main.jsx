@@ -203,14 +203,14 @@ function HomePage() {
         </Ionic.IonToolbar>
       </Ionic.IonHeader>
 
-      <div className="calender">
-        <Calendar
-          onChange={setDateClicked}
-          value={dateClicked}
-          maxDetail="month"
-        />
-      </div>
       <ScrollArea>
+        <div className="calender">
+          <Calendar
+            onChange={setDateClicked}
+            value={dateClicked}
+            maxDetail="month"
+          />
+        </div>
         {pendingarr.map((element) => {
           var date = new Date(element.date);
           var endtime = new Date(element.endtime);

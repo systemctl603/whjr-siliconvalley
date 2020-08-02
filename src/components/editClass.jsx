@@ -39,6 +39,7 @@ export default function EditClass(props) {
   });
   useEffect(() => {
     getValues(props.id).then((res) => setDefval(res));
+    setPerson(defval.person);
   }, [props.id]);
   getPeople();
   const scheduleNotification = async (title, date, notes, person, endtime) => {
@@ -141,7 +142,7 @@ export default function EditClass(props) {
             min="2020"
             max="2040"
             value={defval.date}
-            displayFormat="MMM DD, YYYY hh:mm A"
+            displayFormat="MMM DD hh:mm A"
           ></Ionic.IonDatetime>
         </Ionic.IonItem>
         <Ionic.IonItem>
@@ -151,12 +152,24 @@ export default function EditClass(props) {
             min="2020"
             max="2040"
             value={defval.endtime}
-            displayFormat="hh:mm A"
+            displayFormat="MMM DD hh:mm A"
+          ></Ionic.IonDatetime>
+        </Ionic.IonItem>
+
+        <Ionic.IonItem>
+          <Ionic.IonLabel>Year (Optional for current year):</Ionic.IonLabel>
+          <Ionic.IonDatetime
+            id="year"
+            min={new Date().toISOString()}
+            max="2040"
+            value={defval.endtime}
+            displayFormat="YYYY"
           ></Ionic.IonDatetime>
         </Ionic.IonItem>
         <Ionic.IonItem>
           <Ionic.IonLabel>Person: </Ionic.IonLabel>
           <Ionic.IonSelect
+            value={defval.person}
             onIonChange={(e) => {
               setPerson(e.detail.value);
             }}
@@ -180,13 +193,14 @@ export default function EditClass(props) {
             var date = document.getElementById("date").value;
             var notes = document.getElementById("notes").value;
             var endtime = document.getElementById("enddate").value;
+            var year = document.getElementById("year").value;
 
+            year === undefined ? (year = new Date()) : (year = new Date(year));
             date = new Date(date);
             endtime = new Date(endtime);
 
-            endtime.setFullYear(date.getFullYear());
-            endtime.setMonth(date.getMonth());
-            endtime.setDate(date.getDate());
+            date.setFullYear(year.getFullYear());
+            endtime.setFullYear(year.getFullYear());
 
             if (
               title === "" ||
@@ -219,10 +233,11 @@ export default function EditClass(props) {
               var foreHour = eldate.getTime() - date;
               var afterHour = elendtime.getTime() - endtime;
               if (
-                (eldate <= date && date <= elendtime) ||
-                (eldate <= endtime && endtime <= elendtime) ||
-                (-3600000 <= foreHour && foreHour <= 3600000) ||
-                (-3600000 <= afterHour && afterHour <= 3600000)
+                ((eldate <= date && date <= elendtime) ||
+                  (eldate <= endtime && endtime <= elendtime) ||
+                  (-3600000 <= foreHour && foreHour <= 3600000) ||
+                  (-3600000 <= afterHour && afterHour <= 3600000)) &&
+                element.id !== props.id
               ) {
                 exceptions.push(element);
               }
@@ -284,7 +299,10 @@ export default function EditClass(props) {
                 `Some classes intersect with this:\n${exceptions
                   .map(
                     ({ title, date }) =>
-                      `${title} on ${new Date(date).toLocaleString()}\n`
+                      `${title} on ${new Date(date).toLocaleString("en-US", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}\n`
                   )
                   .join("")}Do you want to continue?`
               );

@@ -91,7 +91,7 @@ export default function AddClassMenu(props) {
             id="date"
             min="2020"
             max="2040"
-            displayFormat="MMM DD, YYYY hh:mm A"
+            displayFormat="MMM DD, hh:mm A"
           ></Ionic.IonDatetime>
         </Ionic.IonItem>
         <Ionic.IonItem>
@@ -100,7 +100,16 @@ export default function AddClassMenu(props) {
             id="enddate"
             min="2020"
             max="2040"
-            displayFormat="hh:mm A"
+            displayFormat="MMM DD, hh:mm A"
+          ></Ionic.IonDatetime>
+        </Ionic.IonItem>
+        <Ionic.IonItem>
+          <Ionic.IonLabel>Year (Optional for current year):</Ionic.IonLabel>
+          <Ionic.IonDatetime
+            id="year"
+            min={new Date().toISOString()}
+            max="2040"
+            displayFormat="YYYY"
           ></Ionic.IonDatetime>
         </Ionic.IonItem>
         <Ionic.IonItem>
@@ -129,12 +138,12 @@ export default function AddClassMenu(props) {
             var date = document.getElementById("date").value;
             var notes = document.getElementById("notes").value;
             var endtime = document.getElementById("enddate").value;
+            var year = document.getElementById("year").value;
+            year === undefined ? (year = new Date()) : (year = new Date(year));
+
             console.log(date);
             date = new Date(date);
             endtime = new Date(endtime);
-            endtime.setFullYear(date.getFullYear());
-            endtime.setMonth(date.getMonth());
-            endtime.setDate(date.getDate());
 
             if (
               title === "" ||
@@ -150,7 +159,16 @@ export default function AddClassMenu(props) {
             } else if (new Date(endtime) <= new Date(date)) {
               window.alert("Endtime is before start");
               return;
+            } else if (endtime.getTime() - date.getTime() > 9800000) {
+              var res = window.confirm(
+                "The duration seems to be greater than 3 hours. Confirm?"
+              );
+              if (!res) return;
             }
+
+            date.setFullYear(year.getFullYear());
+            endtime.setFullYear(year.getFullYear());
+
             console.log(date, endtime);
             var { value } = await Storage.get({ key: "events" });
             value = JSON.parse(value);
@@ -186,8 +204,8 @@ export default function AddClassMenu(props) {
                 id: id,
               });
               console.log(exceptions);
-              date = new Date(date);
-              var d = date;
+
+              var d = new Date(date);
               d.setHours(d.getHours() - 1);
               const notifs = await LocalNotifications.schedule({
                 notifications: [
@@ -212,9 +230,15 @@ export default function AddClassMenu(props) {
               props.callback();
             } else {
               var res = window.confirm(
-                `You have a class at this time:\n${exceptions
+                `Do you want to conttinue booking? \nConflicts:\n${exceptions
                   .map(({ title, date }) => {
-                    return `${title} on ${new Date(date).toLocaleString()}\n`;
+                    return `${title} on ${new Date(date).toLocaleString(
+                      "en-US",
+                      {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      }
+                    )}\n`;
                   })
                   .join("")}`
               );
