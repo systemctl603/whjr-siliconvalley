@@ -8,10 +8,8 @@ import AddProjectMenu from "../components/addProject";
 import AddRecurringClass from "../components/addRecurringClass";
 import EditClass from "../components/editClass";
 import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
 import ScrollArea from "react-scrollbar";
 import "./main.css";
-import "react-calendar/dist/Calendar.css";
 
 const { Storage, LocalNotifications, Modals } = Plugins;
 var pendingarr = [];
@@ -151,6 +149,7 @@ function HomePage() {
   const [showEditMenu, setShowEditMenu] = useState(false);
   const [dateClicked, setDateClicked] = useState(new Date());
   const [showPersonMenu, setShowPersonMenu] = useState(false);
+  const [showRecurringMenu, setShowRecurringMenu] = useState(false);
   const [editId, setEditId] = useState(1);
 
   useEffect(() => {
@@ -188,6 +187,11 @@ function HomePage() {
         setShowAddProject(true);
       },
     },
+    {
+      text: "Add Recurring Event",
+      icon: Icons.calendarOutline,
+      handler: () => setShowRecurringMenu(true),
+    },
     { text: "Cancel", icon: Icons.close, role: "cancel" },
   ];
 
@@ -200,7 +204,11 @@ function HomePage() {
       </Ionic.IonHeader>
 
       <div className="calender">
-        <Calendar onChange={setDateClicked} value={dateClicked} />
+        <Calendar
+          onChange={setDateClicked}
+          value={dateClicked}
+          maxDetail="month"
+        />
       </div>
       <ScrollArea>
         {pendingarr.map((element) => {
@@ -412,6 +420,17 @@ function HomePage() {
           hook={showPersonMenu}
           hookChange={(val) => {
             setShowPersonMenu(val);
+          }}
+        />
+
+        <AddRecurringClass
+          hook={showRecurringMenu}
+          hookChange={(v) => setShowRecurringMenu(v)}
+          callback={() => {
+            setShowRecurringMenu(false);
+            var prevDate = dateClicked;
+            setDateClicked(new Date("1/1/1970"));
+            setTimeout(() => setDateClicked(prevDate), 0);
           }}
         />
       </Ionic.IonContent>

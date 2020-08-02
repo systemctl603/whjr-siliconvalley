@@ -23,57 +23,16 @@ async function getPeople() {
   }
 }
 
+/**
+ *
+ * @props hook
+ * @props hookchange
+ * @props callback
+ */
 export default function AddRecurringClass(props) {
   const [person, setPerson] = useState("");
   const [dayOfWeek, setDayOfWeek] = useState("");
   const [months, setMonths] = useState(1);
-  const scheduleNotification = async (title, date, notes, person, endtime) => {
-    var { value } = await Storage.get({ key: "events" });
-
-    var id = (await Storage.get({ key: "nextid" })).value;
-    var recurringId = (await Storage.get({ key: "recurringid" })).value;
-    id === null ? (id = 1) : (id = parseInt(id));
-    recurringId === null ? (recurringId = 1) : (recurringId = parseInt(id));
-
-    var endtime = new Date(endtime);
-
-    if (value !== null) {
-      value = JSON.parse(value);
-    } else {
-      value = {};
-      value.projects = [];
-      value.classes = [];
-    }
-    date = new Date(date);
-    value.classes.push({
-      title: title,
-      date: date,
-      notes: notes,
-      endtime: endtime,
-      person: person,
-      id: id,
-    });
-    var d = new Date(date);
-    d.setHours(d.getHours() - 1);
-    const notifs = await LocalNotifications.schedule({
-      notifications: [
-        {
-          title: title,
-          body: notes,
-          id: id,
-          schedule: { at: d },
-          sound: null,
-          attachments: null,
-          actionTypeId: "",
-          extra: null,
-        },
-      ],
-    });
-    id += 1;
-    await Storage.set({ key: "events", value: JSON.stringify(value) });
-    await Storage.set({ key: "nextid", value: id.toString() });
-    props.callback();
-  };
   getPeople();
   return (
     <Ionic.IonModal
@@ -100,11 +59,15 @@ export default function AddRecurringClass(props) {
           <Ionic.IonLabel>Description: </Ionic.IonLabel>
           <Ionic.IonInput id="notes"></Ionic.IonInput> <br />
         </Ionic.IonItem>
+
         <Ionic.IonItem>
-          <Ionic.IonLabel onIonChange={(e) => setDayOfWeek(e.detail.value)}>
-            Day of Week:
-          </Ionic.IonLabel>
-          <Ionic.IonSelect>
+          <Ionic.IonLabel>Day of Week:</Ionic.IonLabel>
+          <Ionic.IonSelect
+            onIonChange={(e) => {
+              console.log(e);
+              setDayOfWeek(e.detail.value);
+            }}
+          >
             {daysOfWeek.map((element) => {
               return (
                 <Ionic.IonSelectOption value={element}>
@@ -114,6 +77,7 @@ export default function AddRecurringClass(props) {
             })}
           </Ionic.IonSelect>
         </Ionic.IonItem>
+
         <Ionic.IonItem>
           <Ionic.IonLabel>Number of months</Ionic.IonLabel>
           <Ionic.IonSelect
@@ -128,6 +92,27 @@ export default function AddRecurringClass(props) {
             })}
           </Ionic.IonSelect>
         </Ionic.IonItem>
+
+        <Ionic.IonItem>
+          <Ionic.IonLabel>Event time: </Ionic.IonLabel>
+          <Ionic.IonDatetime
+            id="date"
+            min="2020"
+            max="2040"
+            displayFormat="hh:mm A"
+          ></Ionic.IonDatetime>
+        </Ionic.IonItem>
+
+        <Ionic.IonItem>
+          <Ionic.IonLabel>End time: </Ionic.IonLabel>
+          <Ionic.IonDatetime
+            id="enddate"
+            min="2020"
+            max="2040"
+            displayFormat="hh:mm A"
+          ></Ionic.IonDatetime>
+        </Ionic.IonItem>
+
         <Ionic.IonItem>
           <Ionic.IonLabel>Person: </Ionic.IonLabel>
           <Ionic.IonSelect
@@ -144,21 +129,24 @@ export default function AddRecurringClass(props) {
             })}
           </Ionic.IonSelect>
         </Ionic.IonItem>
+
         <Ionic.IonButton
           expand="full"
           onClick={async () => {
             var id = (await Storage.get({ key: "nextid" })).value;
             id === null ? (id = 1) : (id = parseInt(id));
 
-            var recurringid = (await Storage.get({ key: "recurringid" })).value;
-            recurringid === null
-              ? (recurringid = 1)
-              : (recurringid = parseInt(recurringid));
-
             var title = document.getElementById("title").value;
             var date = document.getElementById("date").value;
-            var notes = document.getElementById("notes").value;
             var endtime = document.getElementById("enddate").value;
+            var notes = document.getElementById("notes").value;
+            var { value } = await Storage.get({ key: "events" });
+            value = JSON.parse(value);
+            if (value === null) {
+              value = {};
+              value.projects = [];
+              value.classes = [];
+            }
 
             var getDaysArray = function (s, e) {
               for (
@@ -171,8 +159,10 @@ export default function AddRecurringClass(props) {
               return a;
             };
             var currentDate = new Date();
-            var endDate = new Date().setHours(currentDate.getHours() + months);
+            var endDate = new Date().setMonth(currentDate.getMonth() + months);
             var daysArray = getDaysArray(currentDate, endDate);
+            console.log(daysArray);
+            console.log(dayOfWeek);
 
             var filteredArray = daysArray.filter((el) => {
               if (daysOfWeek[el.getDay()] === dayOfWeek) {
@@ -181,6 +171,21 @@ export default function AddRecurringClass(props) {
                 return false;
               }
             });
+            console.log(filteredArray);
+
+            filteredArray = filteredArray.map((el) => {
+              var tmp = el;
+              tmp.setHours(new Date(date).getHours());
+              tmp.setMinutes(new Date(date).getMinutes());
+
+              var tmp2 = new Date(endtime);
+              tmp2.setFullYear(tmp.getFullYear());
+              tmp2.setMonth(tmp.getMonth());
+              tmp2.setDate(tmp.getDate());
+
+              return { date: tmp, endtime: tmp2 };
+            });
+            console.log(filteredArray);
 
             if (
               title === "" ||
@@ -188,31 +193,15 @@ export default function AddRecurringClass(props) {
               endtime === undefined ||
               date === undefined
             ) {
-              await Modals.alert({
-                message: "Some fields are empty",
-              });
-              return;
-            } else if (new Date(date) < new Date()) {
-              await Modals.alert({
-                message: "Date is invalid",
-              });
+              window.alert("Some fields are empty");
               return;
             } else if (new Date(endtime) <= new Date(date)) {
-              await Modals.alert({
-                message: "Endtime is before start",
-              });
+              window.alert("Endtime is before start");
               return;
             }
-            for (var date in filteredArray) {
-              var { value } = await Storage.get({ key: "events" });
-              value = JSON.parse(value);
-              if (value === null) {
-                value = {};
-                value.projects = [];
-                value.classes = [];
-              }
-              var exceptions = [];
+            let exceptions = [];
 
+            filteredArray.forEach(({ date, endtime }) => {
               value.classes.forEach((element) => {
                 var eldate = new Date(element.date);
                 var elendtime = new Date(element.endtime);
@@ -229,20 +218,28 @@ export default function AddRecurringClass(props) {
                 }
                 console.log(exceptions);
               });
+            });
 
-              if (exceptions.length <= 0) {
+            if (exceptions.length !== 0) {
+              var res = window.confirm(
+                `You have a class at this time:\n${exceptions
+                  .map(({ title, date }) => {
+                    return `${title} on ${new Date(date).toLocaleString()}\n`;
+                  })
+                  .join("")}`
+              );
+              if (res === false) return;
+            }
+            filteredArray.forEach(async ({ date, endtime }) => {
+              if (date > new Date()) {
                 value.classes.push({
+                  notes: notes,
                   title: title,
                   date: date,
-                  notes: notes,
                   endtime: endtime.toISOString(),
                   person: person,
                   id: id,
                 });
-
-                console.log(exceptions);
-                date = new Date(date);
-                console.log(date);
 
                 const notifs = await LocalNotifications.schedule({
                   notifications: [
@@ -258,18 +255,15 @@ export default function AddRecurringClass(props) {
                     },
                   ],
                 });
-
-                await Storage.set({
-                  key: "events",
-                  value: JSON.stringify(value),
-                });
-
                 id += 1;
-                await Storage.set({ key: "nextid", value: id.toString() });
-
-                props.callback();
               }
-            }
+            });
+            props.callback();
+            await Storage.set({
+              value: JSON.stringify(value),
+              key: "events",
+            });
+            await Storage.set({ key: "nextid", value: id.toString() });
           }}
         >
           Submit
